@@ -1,0 +1,209 @@
+------DDL---------
+
+CREATE TABLE sample_data(cust_id number(4,0), cust_name VARCHAR(20), email_id VARCHAR(20));
+
+-- SELECT * FROM sample_data;
+
+DESCRIBE sample_data;
+
+-- Alter command/statement
+-- 1. Adding a Column
+-- 2. Remove a coloumn
+-- 3. Rename a coloumn
+-- 4. Rename the coloumn
+-- 5. Change column size
+-- 6. Change column data type
+-- 7 Add or remove contraints
+
+ALTER TABLE sample_data ADD mobile_no CHAR(10); --adding a column
+
+DESCRIBE sample_data;
+
+ALTER TABLE sample_data DROP COLUMN mobile_no; -- removing a column 
+DESCRIBE sample_data;
+
+ALTER TABLE sample_data ADD cust_name CHAR(10); --Error try adding existing column again 
+
+-- ALTER TABLE sample_data RENAME COLUMN cust_id TO customer_id;
+ALTER TABLE sample_data RENAME COLUMN cust_id TO customer_id;
+DESCRIBE sample_data;
+ALTER TABLE sample_data RENAME TO customer;
+--Renaming a Table
+DESCRIBE sample_data;
+DESCRIBE customer;
+--table is accessible with new name
+ALTER TABLE customer MODIFY  cust_name VARCHAR(30);
+DESCRIBE customer;
+
+ALTER TABLE customer MODIFY  cust_name VARCHAR(10);
+DESCRIBE customer;
+
+ALTER TABLE customer ADD mobile_no number(10,0);
+ALTER TABLE customer MODIFY  mobile_no CHAR(10);
+DESCRIBE customer;
+
+TRUNCATE TABLE customer; -- removes data from the table but empty table structure will still remain
+
+DESCRIBE customer;
+
+DROP TABLE customer; -- removes data as well as table permanantly
+DESCRIBE customer; 
+
+-----------------------------------------
+
+---DML----
+
+
+CREATE TABLE employee(empno number, ename varchar2(20), city varchar2(15), salary number(8,2));
+
+INSERT INTO employee (empno , ename , city, salary) VALUES (101,'Ajit','Hyderabad',10000.00);
+
+INSERT INTO employee VALUES (101,'Ajit','Hyderabad',10000.00);
+
+INSERt INTO employee VALUES(102,'Chithra');     ---error
+
+INSERt INTO employee(empno, ename) VALUES(102,'Chithra'); 
+
+INSERT ALL
+    INTO employee (empno, ename, city, salary) VALUES (104, 'srijit', 'Mumbai', 14000.00)
+    INTO employee (empno, ename, city, salary) VALUES (105, 'Elsa', 'Pune', 15500)
+SELECT * FROM dual;
+SELECT * FROM employee;
+
+CREATE TABLE employee_new(empno number, ename varchar2(20), city varchar2(15), salary number(8,2));
+
+insert into employee_new select*from employee;
+
+select* from employee_new;
+
+---Update Statement----
+
+Update employee set empno=103 where ename='Chithra';
+
+Update employee set empno=103 where ename='CHITHRA'; 
+-- STRINGS IN SQL IS CASE SENSITIVE
+select* from employee;
+
+UPDATE employee set salary = salary*1.1;
+select* from employee;
+
+UPDATE employee set city = 'Delhi' where ename='Chithra';
+
+-- java , python --> = for assignment and == comparison
+-- SQL --> = is the symbol for both the ops
+
+UPDATE employee set salary = salary*1.2 where empno <103;
+
+select* from employee;
+
+UPDATE employee set salary =15000, city='KOLKATA' where ename='Chithra'
+UPDATE employee set salary = salary*1.1 where city='KOLKATA' or ename='Elsa'
+
+DELETE FROM Employee where salary>20000;
+select* from employee;
+
+DELETE FROM EMPLOYEE;
+select* from employee; ---behaves similar to truncate, but there is a diff interenally
+
+-- delete is DML and truncate is DDL statement
+--delete does row  by row  deletion and truncate removes all in one go
+--rollback is possible after delete but not after truncate 
+-- delete does not realses a space but truncate releases a space immediately
+-- conditional delete is possible only in delete statement
+-- performance: truncate is much faster than the delete (maintence the rollback info. also triggers the delete trigger(if any))
+-- delete executes delete triggers and truncate does not
+
+---Constraints--
+Create table emp (empno number unique, ename varchar2(20));
+
+INSERT INTO emp VALUES(1001,'Alice');
+INSERT INTO emp VALUES(1001,'BOB'); -- Error:- unique constraint (SQL_RDNETMINZVSKGJVTBICTRKVSR.SYS_C00181346501) violated ORA-06512: at "SYS.DBMS_SQL"
+INSERT INTO emp VALUES(1002,'Alice');
+INSERT INTO emp VALUES(NULL,'Chitra');
+INSERT INTO emp VALUES(NULL,'DAVID');
+
+select*from emp;
+
+ALTER TABLE emp MODIFY  ename varchar2(20) NOT NULL;
+
+DESCRIBE emp;
+
+INSERT INTO emp VALUES(1003,'DAVID');
+INSERT INTO emp VALUES(1004,'DAVID');
+INSERT INTO emp VALUES(1005,'DAVID');
+INSERT INTO emp VALUES(1006,NULL);
+
+select*from emp;
+
+DROP TABLE emp;
+
+select*from emp; ---table or view does not exist
+
+CREATE TABLE emp (
+    empno NUMBER,
+    ename VARCHAR2(20),
+    CONSTRAINT emp_pk_cons PRIMARY KEY (empno)
+);
+
+
+insert into emp values (1001,'Atul');
+insert into emp values (1002,'bala');
+insert into emp values (NULL,'CHETNA'); --ERROR:  cannot insert NULL into ("SQL_RDNETMINZVSKGJVTBICTRKVSR"."EMP"."EMPNO") ORA-06512: at "SYS.DBMS_SQL"
+insert into emp values (1001,'DIVYA');
+
+
+CREATE TABLE project (proj_id NUMBER PRIMARY KEY, duration number, empid number,
+                        constraint project_fk_cons foreign key(empid) references emp(empno))
+
+select * from emp;
+
+insert into project values(101,12,1001);
+insert into project values(102,24,1001);
+insert into project values(103,18,NULL);
+
+select * from project;
+
+insert into project values(104,12,1005); --Error: integrity constraint (SQL_RDNETMINZVSKGJVTBICTRKVSR.PROJECT_FK_CONS) violated - parent key not found 
+
+-- 3 important characterisitics of foreign key:
+  -- can take null values
+  -- can take duplicate values as well
+  -- should be a subset of primary key(value which is not in the primary key column, will not be allowed)
+
+delete from emp where empno= 1001; --Error:  integrity constraint (SQL_RDNETMINZVSKGJVTBICTRKVSR.PROJECT_FK_CONS) violated - child record found.
+
+drop table project;
+
+CREATE TABLE project (proj_id NUMBER PRIMARY KEY, duration number, empid number,
+                        constraint project_fk_cons foreign key(empid) references emp(empno) on delete set null)
+
+
+
+insert into project values(101,12,1001);
+insert into project values(102,24,1001);
+insert into project values(103,18,NULL);
+
+select * from emp;
+
+delete from emp where empno= 1001;
+
+select * from project;
+
+insert into emp values(1001,'Atul');
+
+drop table project;
+
+CREATE TABLE project (proj_id NUMBER PRIMARY KEY, duration number, empid number,
+                        constraint project_fk_cons foreign key(empid) references emp(empno) on delete cascade)
+
+
+
+insert into project values(101,12,1001);
+insert into project values(102,24,1001);
+insert into project values(103,18,NULL);
+
+select * from emp;
+
+delete from emp where empno= 1001;
+
+select * from project;

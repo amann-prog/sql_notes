@@ -1,0 +1,116 @@
+--SUBQUERIES--
+
+-- display the name of the person who is getting least salary
+
+select ename, sal from scott.emp where sal = (select min(sal) from scott.emp); -- SINGLE ROW SUBQUERY
+
+-- DISPLAY THE NAME OF THE PERSON WHO IS GETTING SAL GREATER THAN THE OVERALL AVERAGE SALARY
+SELECT ENAME,SAL FROM SCOTT.EMP WHERE SAL>(SELECT AVG(SAL) FROM SCOTT.EMP); --SINGLE ROW SUBQUERY
+
+--GET THE DETAILS OF THE PEOPLE WHO ARE GETTING SALARY HIGHER THAN ALLEN AND JONES
+SELECT * FROM SCOTT.EMP WHERE SAL >( SELECT SAL FROM SCOTT.EMP WHERE ENAME='ALLEN' OR ENAME='JONES') --ERROR: single-row subquery returns more than one row
+
+SELECT * FROM SCOTT.EMP WHERE SAL > ALL ( SELECT SAL FROM SCOTT.EMP WHERE ENAME='ALLEN' OR ENAME='JONES') -- MULTIPLE ROW SUBQUERY
+
+--DISPLAY THE LIST OF PEOPLE WHO ARE WORKING IN KING'S DEPT OR SCOTT'S DEPT
+SELECT * FROM SCOTT.EMP WHERE DEPTNO= ANY(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME='KING' OR ENAME='SCOTT');
+SELECT * FROM SCOTT.EMP WHERE DEPTNO IN(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME='KING' OR ENAME='SCOTT');
+SELECT * FROM SCOTT.EMP WHERE DEPTNO IN(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME IN('KING','SCOTT'));
+
+SELECT SCOTT.EMP.*, (SELECT MIN (SAL) FROM SCOTT.EMP) AS MIN_SAL FROM SCOTT.EMP;
+
+SELECT SCOTT.EMP.*, 
+    (SELECT MIN (SAL) FROM SCOTT.EMP) AS MIN_SAL, 
+    (SELECT MAX (SAL) FROM SCOTT.EMP) AS MAX_SAL
+    FROM SCOTT.EMP;
+
+SELECT * 
+    FROM (SELECT DEPTNO, 
+                  MIN(SAL) AS MIN_SAL, 
+                  MAX(SAL) AS MAX_SAL,
+                  ROUND(AVG(SAL),2) AS AVG_SAL,
+                  SUM(SAL) AS TOTAL_SAL
+           FROM SCOTT.EMP
+           GROUP BY DEPTNO)
+
+WITH EMP_SUMMARY AS (SELECT DEPTNO, 
+                  MIN(SAL) AS MIN_SAL, 
+                  MAX(SAL) AS MAX_SAL,
+                  ROUND(AVG(SAL),2) AS AVG_SAL,
+                  SUM(SAL) AS TOTAL_SAL
+           FROM SCOTT.EMP
+           GROUP BY DEPTNO)
+SELECT * FROM SCOTT.EMP JOIN EMP_SUMMARY USING(DEPTNO) ORDER BY DEPTNO;
+
+SELECT * FROM EMP_SUMMARY;  --- IT WILL NOT WORK AS THIS TABLE NOT STORED IN MEMORY
+
+SELECT * FROM SCOTT.DEPT;
+
+--GET THE DETAILS OF DEPARTMENTS WHERE WE  HAVE ANY EMPLOYEE WORKING 
+SELECT * FROM SCOTT.EMP WHERE EXISTS (SELECT * FROM SCOTT.EMP, SCOTT.DEPT WHERE SCOTT.EMP.DEPTNO  = SCOTT.DEPT.DEPTNO)
+--GET THE DETAILS OF DEPARTMENTS WHERE WE DO NOT HAVE ANY EMPLOYEE WORKING
+SELECT * FROM SCOTT.DEPT WHERE EXISTS (SELECT * FROM SCOTT.EMP WHERE SCOTT.EMP.DEPTNO  = SCOTT.DEPT.DEPTNO)
+
+-- CORRELATED SUBQUERY
+-- GET THE DETAILS OF EMPLOYESS WHO ARE GETTING SALARY HIGHER  THAN THE AVERAGE OF THEIR RESPECTIVE DEPARTMENT
+
+
+select * from scott.emp where sal> any (select avg(sal) from scott.emp group by deptno) --- not mapping for respective department providing data for all department
+
+select * from scott.emp e1 where sal> (select avg(e2.sal) from scott.emp e2 where e1.deptno=e2.deptno) -- mapping to provide respective department
+                  --- correlated subquerry (similar to that of inner and outer loop concept of nested loop)
+						-- it's using the same table which is used  in used in the outer query 
+						-- for every record(row) being processed with outer query, complete inner query will run iterativly
+-- get the details of the person who is getting highest salary in his dept
+select * from scott.emp e1 where e1.sal=(select max(e2.sal) from scott.emp e2 where e1.deptno=e2.deptno);
+
+--set operations
+create table emp1(empno number, ename varchar2(20), deptno number);
+
+insert into emp1 values(1001, 'Ajit',10);
+insert into emp1 values(1002,'bob',10);
+insert into emp1 values(1003,'john',20);
+insert into emp1 values(1004,'els',20);
+
+create table emp2(empno number, ename varchar2(20), deptno number);
+
+insert into emp2 values(1001, 'john',20);
+insert into emp2 values(1002,'elsa',20);
+insert into emp2 values(1003,'raju',30);
+insert into emp2 values(1004,'sunny',30);
+
+select * from emp1
+union
+select * from emp2
+
+select * from emp1
+union all
+select * from emp2
+
+select * from emp1
+intersect
+select * from emp2
+
+select * from emp1
+minus
+select * from emp2
+
+--------------------------------------------------------
+-- Hierarchial retrieval
+SELECT EMPNO, ENAME, MGR FROM SCOTT.EMP CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING'
+
+SELECT EMPNO, ENAME, MGR, LEVEL FROM SCOTT.EMP CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING' ORDER BY LEVEL
+
+SELECT EMPNO, ENAME, MGR, LEVEL 
+    FROM SCOTT.EMP 
+    CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING'  ORDER SIBLINGS BY ENAME
+
+SELECT EMPNO, ENAME, MGR, LEVEL 
+    FROM SCOTT.EMP 
+    CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING'  ORDER SIBLINGS BY ENAME DESC
+
+SELECT SYS_CONNECT_BY_PATH(ENAME,'/') FROM SCOTT.EMP
+       CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING'
+
+SELECT ENAME, CONNECT_BY_ISLEAF FROM SCOTT.EMP
+       CONNECT BY PRIOR EMPNO=MGR START WITH ENAME='KING'

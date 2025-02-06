@@ -1,0 +1,212 @@
+CREATE TABLE sample_data (cust_id NUMBER(4, 0), cust_name VARCHAR2(20), email_id VARCHAR2(20));
+
+
+CHAR(10)    : Dnyanesh --> 8  --> remaining 2 positions will also be used (by adding spaces at the end to make string of length 10)
+VARCHAR(10) : Dnyanesh --> 8 --> it will store the string with 8 chars only --> remaining 2 places can be used to store any other values
+
+VARCHAR2(10) : Oracle standard --> similar to VARCHAR --> but capacity is higher than the varchar --> it does not take a space to store null 
+
+-- string 1 char will take 1 byte
+-- 2 bytes 
+-- 2 bytes * 10000000   -> massive diff.
+-- save the memory as well as optimization for data processing
+
+SELECT * FROM sample_data;
+
+DESCRIBE sample_data;
+
+-- Alter command/statement
+	-- 1. Adding a column
+	-- 2. Remove a column
+	-- 3. Rename a column
+	-- 4. Rename the table
+	-- 5. Change column size
+	-- 6. Change column data type
+	-- 7. Add or remove constraints
+
+ALTER TABLE sample_data ADD mobile_no CHAR(10);  -- adding a column
+
+DESCRIBE sample_data;
+
+ALTER TABLE sample_data DROP COLUMN mobile_no;   -- removing a column
+
+DESCRIBE sample_data;
+
+ALTER TABLE sample_data ADD cust_name CHAR(10);   -- ERROR: try adding existing column again
+
+ALTER TABLE sample_data RENAME COLUMN cust_id TO customer_id;  -- renaming a column
+
+DESCRIBE sample_data;
+
+ALTER TABLE sample_data RENAME TO customer;    -- Renaming a table
+
+DESCRIBE sample_data;   -- error
+
+DESCRIBE customer; -- table is accessible with new name
+
+ALTER TABLE customer MODIFY cust_name VARCHAR(30);
+
+DESCRIBE customer; 
+
+
+ALTER TABLE customer MODIFY cust_name VARCHAR(10);
+
+ALTER TABLE customer ADD mobile_no number(10, 0);
+ALTER TABLE customer MODIFY mobile_no CHAR(10);
+
+TRUNCATE TABLE customer;     -- removes data from the table but empty table structure will still remain
+
+DESCRIBE customer; 
+
+DROP TABLE customer;         -- removes data as well as table permenantly
+
+DESCRIBE customer; 
+
+----------------------------------------------------------
+
+CREATE TABLE employee(empno number, ename varchar2(20), city varchar2(15), salary number(8, 2));
+
+-- Insert operation
+
+INSERT INTO employee(empno, ename, city, salary)  VALUES(101, 'Ajit', 'Hyderabad', 10000.00);
+INSERT INTO employee VALUES(102, 'Bob', 'Bengaluru', 12000.00);
+
+INSERT INTO employee VALUES(102, 'Chithra');  -- error
+
+INSERT INTO employee(empno, ename) VALUES(102, 'Chithra');
+
+INSERT ALL INTO employee(empno, ename, city, salary) VALUES(104, 'Divya', 'Mumbai', 14000.00)
+    	   INTO  employee(empno, ename, city, salary) VALUES(105, 'Elsa', 'Pune', 15000)
+	SELECT 1 from DUAL;
+
+
+SELECT * FROM employee;
+
+
+CREATE TABLE employee_new(empno number, ename varchar2(20), city varchar2(15), salary number(8, 2));
+
+insert into employee_new select * from employee;
+
+select * from employee_new;
+
+-- Update Statement
+
+Update employee set empno = 103 where ename='Chithra';
+
+Update employee set empno = 103 where ename='CHITHRA';  -- will not matach any record (strings are case sensitive)
+select * from employee;
+
+Update employee set salary = salary*1.1;  -- add 10% into the salary
+
+UPDATE employee set city = 'Delhi' where ename = 'Chithra';
+
+-- java, python  --> = for assignment and == comparison
+-- SQL --> = is the symbol for both the ops.
+
+
+UPDATE employee set salary = salary*1.2 where empno > 103;
+select * from employee;
+
+UPDATE employee set salary = 15000, city='Kolkata' where ename='Chithra';
+
+UPDATE employee set salary = salary*1.1 where city='Kolkata' or ename='Elsa';
+
+DELETE FROM Employee where salary > 20000; 
+
+DELETE FROM employee;  -- behaves similar to truncate, but there is a diff. internally
+
+
+select * from employee;
+
+Create table emp (empno number unique, ename varchar2(20));
+
+INSERT INTO emp VALUES(1001, 'Alice');
+INSERT INTO emp VALUES(1001, 'Bob');  -- error
+INSERT INTO emp VALUES(1002, 'Alice');
+INSERT INTO emp VALUES(NULL, 'Chitra');
+INSERT INTO emp VALUES(NULL, 'David');
+
+select * from emp;
+
+ALTER TABLE emp MODIFY ename varchar2(20) NOT NULL;
+
+DESCRIBE emp;
+
+INSERT INTO emp VALUES(1003, 'David');
+INSERT INTO emp VALUES(1004, 'David');
+
+INSERT INTO emp VALUES(1005, NULL);
+
+DROP TABLE emp;
+
+Create table emp (empno number, ename varchar2(20), constraint emp_pk_cons primary key(empno));
+
+insert into emp values(1001, 'Atul');
+insert into emp values(1002, 'Bala');
+
+insert into emp values(NULL, 'Chetna');   -- error
+insert into emp values(1001, 'Divya');    -- error
+
+CREATE TABLE project (proj_id number primary key, duration number, empid number,
+    					constraint project_fk_cons foreign key(empid) references emp(empno));
+
+select * from emp; 
+
+insert into project values(101, 12, 1001);
+insert into project values(102, 24, 1001);
+insert into project values(103, 18, NULL);
+
+select * from project;
+
+insert into project values(104, 12, 1005);   -- error
+
+-- 3 important characteristics of foreign key:
+	-- can take null values
+	-- can take duplicate values as well
+	-- should be a subset of primary key (value which is not in the primary key column, will not be allowed)
+
+
+delete from emp where empno = 1001;
+
+drop table project;
+
+CREATE TABLE project (proj_id number primary key, duration number, empid number,
+    					constraint project_fk_cons foreign key(empid) references emp(empno) on delete set null);
+
+insert into project values(101, 12, 1001);
+insert into project values(102, 24, 1001);
+insert into project values(103, 18, NULL);
+
+select * from project
+
+delete from emp where empno = 1001;
+
+insert into emp values(1001, 'Atul');
+
+
+drop table project;
+
+CREATE TABLE project (proj_id number primary key, duration number, empid number,
+    					constraint project_fk_cons foreign key(empid) references emp(empno) on delete cascade);
+
+insert into project values(101, 12, 1001);
+insert into project values(102, 24, 1001);
+insert into project values(103, 18, NULL);
+
+select * from project
+
+delete from emp where empno = 1001;
+
+
+
+
+
+
+
+
+
+
+
+    
+ 
+

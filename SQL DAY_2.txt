@@ -1,0 +1,167 @@
+create table emp (empno number, ename varchar2(20), age number check(age>=18 and age<=60));
+
+insert into emp values (101,'Aliva',21);
+insert into emp values (102,'Babita',32);
+
+select * from emp;
+
+insert into emp values (103,'Chetan',15); --Error:  check constraint (SQL_EDYLRSJZXLYEXMTZJIAPFUOEH.SYS_C00181403009) violated 
+insert into emp values (103,'Deepak',62); 
+
+insert into emp(empno) values(103);
+insert into emp(empno, age) values(104,40);
+
+Alter table emp modify ename varchar2(20) default 'Unknown';
+
+desc emp;
+
+select * from emp;
+
+insert into emp(empno, age) values(105,42);
+
+select * from emp;
+
+insert into emp values(106,'Elsa',42);
+
+
+insert into emp values(107,Null,38);
+
+select * from emp;
+
+select * from user_indexes;
+
+CREATE INDEX emp_age_idx on emp(age); --non-unique index
+
+select * from user_indexes;
+
+CREATE UNIQUE INDEX emp_id_idx on emp(empno); -- unique index
+
+CREATE  INDEX emp_comp_idx on emp(age,ename); --composite index
+
+
+---------------------------------------------------------
+-- Synonym
+select * from user_synonyms;
+
+CREATE SYNONYM emp_tbl  for emp;
+
+select * from emp_tbl;
+
+select * from emp;
+
+update emp_tbl set ename='Amann', age=33 where empno=103;
+
+select * from emp;
+
+select * from user_indexes;
+select * from user_synonyms;
+
+drop table emp;
+
+select * from emp_tbl;
+
+drop synonym emp_tbl;
+
+--Select statement
+-- simplest select query, no filter on rows and columns
+
+SELECT * FROM SCOTT.EMP;
+
+-- FILTER THE ROWS
+SELECT * FROM SCOTT.EMP WHERE DEPTNO=30;
+
+--filter the column, instead of writing * in the select clause mention names of required coloumn
+
+SELECT EMPNO, ENAME, JOB, SAL FROM SCOTT.EMP;
+
+-- FILTERING ROWS AND CPLOUMNS BOTH
+SELECT EMPNO, ENAME, JOB, SAL FROM SCOTT.EMP WHERE DEPTNO=10;
+
+--WHERE : TO APPLY THE FILTER ON ROWS
+--SELECT: TO APPLY THE FILTER ON COLUMNS(* for selecting all columns) --> projection
+
+-- display the empno, ename and sal for the employees getting sal more than 2000
+-- display the list of people who are working as manager
+-- who all joined after 31st Dec 1981.
+-- list of emps working in dept 10 and deptno 20
+-- list of people who are not elegible for commISSION
+-- list of people who are eligible for commission
+-- people working as Analysts and getting sal above 2000
+-- who all are getting sal in the range of 1000 and 2000 (both inclusive)
+-- all the employees whose names are starting  with A
+-- all the employess whose name is ending with E
+-- employess having second char as A in their name
+-- employees getting sal greater than FORD AND MILLER
+-- employees getting sal greater than FORD OR MILLER
+
+SELECT EMPNO, ENAME, JOB, SAL FROM SCOTT.EMP WHERE JOB='MANAGER';
+SELECT  ENAME  FROM SCOTT.EMP WHERE JOB='MANAGER';
+SELECT * FROM SCOTT.EMP;
+SELECT  ENAME  FROM SCOTT.EMP WHERE HIREDATE> '31-DEC-1981';
+SELECT sysdate from dual;
+
+SELECT ENAME FROM SCOTT.EMP WHERE DEPTNO= 10 AND DEPTNO=20;
+
+SELECT ENAME FROM SCOTT.EMP WHERE DEPTNO= 10 OR DEPTNO=20;
+
+SELECT ENAME FROM SCOTT.EMP WHERE DEPTNO IN (10,20);
+
+SELECT ENAME FROM SCOTT.EMP WHERE DEPTNO = ANY(10,20);
+
+SELECT * FROM SCOTT.EMP WHERE COMM=NULL;-- NOT A CORRECT WAY FOR NULL BASED COMPARISON
+
+SELECT * FROM SCOTT.EMP WHERE COMM IS NULL;
+
+SELECT * FROM SCOTT.EMP WHERE COMM IS NOT NULL;
+
+SELECT * FROM SCOTT.EMP WHERE JOB='ANALYST' AND SAL>2000;
+
+SELECT * FROM SCOTT.EMP WHERE SAL >= 1000 AND SAL <= 2000; 
+
+SELECT * FROM SCOTT.EMP WHERE SAL BETWEEN 1000 AND 2000;
+
+SELECT * FROM SCOTT.EMP WHERE ename like 'A%';  
+
+SELECT * FROM SCOTT.EMP WHERE ename like '%E';  
+
+SELECT * FROM SCOTT.EMP WHERE ename like '_A%'; create table emp (empno number, ename varchar2(20), age number check(age>=18 and age<=60));
+
+insert into emp values (101,'Aliva',21);
+insert into emp values (102,'Babita',32);
+
+select * from emp;
+
+insert into emp values (103,'Chetan',15); --Error:  check constraint (SQL_EDYLRSJZXLYEXMTZJIAPFUOEH.SYS_C00181403009) violated 
+insert into emp values (103,'Deepak',62); 
+
+insert into emp(empno) values(103);
+insert into emp(empno, age) values(104,40);
+
+Alter table emp modify ename varchar2(20) default 'Unknown';
+
+desc emp;
+
+select * from emp;
+
+insert into emp(empno, age) values(105,42);
+
+select * from emp;
+
+insert into emp values(106,'Elsa',42);
+
+
+insert into emp values(107,Null,38);
+
+select * from emp;
+
+select * from user_indexes;
+
+CREATE INDEX emp_age_idx on emp(age); --non-unique index
+
+select * from user_indexes;
+
+CREATE UNIQUE INDEX emp_id_idx on emp(empno); -- unique index
+
+CREATE  INDEX emp_comp_idx on emp(age,ename); --composite index
+
+

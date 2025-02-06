@@ -1,0 +1,86 @@
+select ename from scott.emp where regexp_like(ename,'^A');
+select ename from scott.emp where regexp_like(ename,'E$');
+select ename from scott.emp where regexp_like(ename,'.A');
+select ename from scott.emp where regexp_like(ename,'^.A');
+
+SELECT * from scott.emp;
+
+select ename from scott.emp where regexp_like(ename,'T*');
+select ename from scott.emp where regexp_like(ename,'T+');
+select ename from scott.emp where regexp_like(ename,'T?');
+select ename from scott.emp where regexp_like(ename,'[A-Z]');
+select ename from scott.emp where regexp_like(ename,'[ABC]');
+select ename from scott.emp where regexp_like(ename,'^A');
+select ename from scott.emp where regexp_like(ename,'E$');
+select ename from scott.emp where regexp_like(ename,'.A');
+select ename from scott.emp where regexp_like(ename,'^.A');
+
+SELECT * from scott.emp;
+
+select ename from scott.emp where regexp_like(ename,'T*');
+select ename from scott.emp where regexp_like(ename,'T+');
+select ename from scott.emp where regexp_like(ename,'T?');
+select ename from scott.emp where regexp_like(ename,'[A-Z]');
+select ename from scott.emp where regexp_like(ename,'^[ABC]');
+
+SELECT ename, regexp_replace(ename, 'A', 'B') from scott.emp;
+
+SELECT ename, regexp_replace(ename, '[A-H]', 'Z') from scott.emp;
+
+-----------------------------------------------------------------
+-- Number Function
+select mod(10,2) from dual;
+select mod(2,10) from dual;
+
+select mod(10,3) from dual;
+
+select abs(10) from dual;
+select abs(-10) from dual;
+
+select power(10,3) from dual;
+
+select round(10.1234) from dual;
+select round(10.5234) from dual;
+select round(10.1234,2) from dual;
+select round(1234.1234,-2) from dual;
+
+select trunc(1234.1234,-2) from dual;
+select trunc(1234.1234) from dual;
+select trunc(1234.1234, 2) from dual;
+
+select floor(10.1) from dual;
+select floor(10.9) from dual;
+
+select ceil(10.1) from dual;
+select ceil(10.9) from dual;
+
+---summary: Number functions ---> mod, abs, power, round, floor, ceil, trunc
+
+-----------------------------------------------------------
+
+
+
+--1. retrieve all the emp names ending with 'S'
+--2. retrieve details of all the employees working in dept 10
+--3. retrieve details  of all the employees not working in dept 20
+--4. retrieve the names of employees getting salary > 1000 and salary<2000
+--5. retrieve the designations where commission is not applicable
+--6. retrieve Blake's immediate subordinates(who all are working in Blake's team)
+--7. retrieve date of joining for 'TURNER'
+--8. employee names associated with id 7698, 7566,7902
+--9. retrieve employees working in department with dept no as 10 or 20
+--10. who all joined after 'JONES'
+--11. display all the data sorted according to sal
+--12. display all the data sorted according to date of joining of employess
+--13. add new column as gross_salary by adding salary and commission data
+--14. convert all manager's designations in lower case
+--15. increase the salary of scott by 5%
+--16. Transfer  all the employess from dept 10 to 20 whose names are starting with 'L'
+--17. BOB Recently got a promotion as a 'MANAGER', modify his record accordingly
+--18. show the total sal paid department wise 
+--19. show the avg sal paid job wise
+--20. how many people are getting sal greater than 1500
+--21. how the min and max sal for the departments where avg sal of the dept is less then 2000
+--22. all the people working in the departments for which we are paying avg sal more than 1500
+--23. display ename, deptno, min sal and max sal for dept 30(as separate columns)
+--24. show the dept id of these depts which are paying avg sal more than overall avg sal 

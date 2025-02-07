@@ -1,0 +1,448 @@
+--- SEQUENCE
+
+CREATE SEQUENCE SEQ_DEMO
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 5
+NOCYCLE
+NOCACHE;
+
+SELECT SEQ_DEMO.NEXTVAL FROM DUAL;
+DROP SEQUENCE SEQ_DEMO
+
+CREATE SEQUENCE SEQ_DEMO
+START WITH 1
+INCREMENT BY 1
+MAXVALUE 5
+CYCLE
+NOCACHE;
+
+SELECT SEQ_DEMO.NEXTVAL FROM DUAL;
+DROP SEQUENCE SEQ_DEMO
+
+CREATE SEQUENCE SEQ_DEMO
+START WITH 3
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 5
+CYCLE
+NOCACHE;
+
+SELECT SEQ_DEMO.NEXTVAL FROM DUAL;
+DROP SEQUENCE SEQ_DEMO
+
+CREATE SEQUENCE SEQ_DEMO
+INCREMENT BY -1
+MINVALUE 1
+MAXVALUE 5
+CYCLE
+NOCACHE;    
+
+SELECT SEQ_DEMO.NEXTVAL FROM DUAL;
+DROP SEQUENCE SEQ_DEMO
+
+CREATE SEQUENCE SEQ_DEMO
+INCREMENT BY -1
+MINVALUE 1
+MAXVALUE 5
+CYCLE
+CACHE 2;    
+
+CREATE TABLE ORDER_DATA(ORDER_ID VARCHAR(10), CUST_ID NUMBER, ORDER_AMT NUMBER);
+CREATE SEQUENCE ORDER_ID_SEQ
+INCREMENT BY 1
+MINVALUE 1
+MAXVALUE 500
+NOCYCLE
+NOCACHE;
+
+INSERT INTO ORDER_DATA VALUES('ORD' || ORDER_ID_SEQ.NEXTVAL, 1001, 1200.50);
+INSERT INTO ORDER_DATA VALUES('ORD' || ORDER_ID_SEQ.NEXTVAL, 1002, 1200.50);
+INSERT INTO ORDER_DATA VALUES('ORD' || ORDER_ID_SEQ.NEXTVAL, 1001, 1200.50);
+
+SELECT * FROM ORDER_DATA
+
+SELECT * FROM USER_TABLES;
+SELECT * FROM ALL_TABLES;
+
+SELECT * FROM USER_TAB_COLUMNS;
+
+SELECT * FROM USER_CONSTRAINTS;
+
+ALTER TABLE ORDER_DATA MODIFY ORDER_ID VARCHAR(10) PRIMARY KEY;
+
+SELECT * FROM USER_CONSTRAINTS;
+
+SELECT * FROM USER_INDEXES;
+SELECT * FROM USER_IND_COLUMNS;
+
+SELECT * FROM USER_VIEWS;
+
+CREATE VIEW VIEW_DEMO AS SELECT * FROM ORDER_DATA;
+SELECT* FROM USER_VIEWS;
+
+SELECT * FROM USER_SEQUENCES;
+SELECT * FROM USER_SYNONYMS;
+=====================================================
+--PL-SQL 
+
+DECLARE
+    NUM1 NUMBER:= 100;
+    NUM2 NUMBER:= 200;
+    NUM3 NUMBER;
+BEGIN
+    NUM3:= NUM1+NUM2;
+    DBMS_OUTPUT.PUT_LINE('ADITION OF NUM1 AND NUM2 IS ' || NUM3);
+END;
+
+DECLARE
+    NUM1 NUMBER:= 100;
+    NUM2 NUMBER:= 200;
+    --NUM3 NUMBER;  -- identifier 'NUM3' must be declared 
+BEGIN
+    NUM3:= NUM1+NUM2;
+    DBMS_OUTPUT.PUT_LINE('ADITION OF NUM1 AND NUM2 IS ' || NUM3);
+END;
+
+DECLARE
+    V_EMPNO NUMBER:=7566;
+    V_ENAME VARCHAR2(20);
+ 	V_SALARY NUMBER;
+BEGIN
+    SELECT ENAME, SAL INTO V_ENAME, V_SALARY FROM SCOTT.EMP WHERE EMPNO=V_EMPNO;
+	DBMS_OUTPUT.PUT_LINE(' NAME OF THE PERSON IS:' || V_ENAME);
+	DBMS_OUTPUT.PUT_LINE(' SALARY OF THE PERSON IS:' || V_SALARY);
+END;
+
+-- CREATING STATIC PROCEDURE (HAS NO PARAMETERS)
+CREATE OR REPLACE PROCEDURE  PROC1 AS
+BEGIN
+   DBMS_OUTPUT.PUT_LINE('THIS MESSAGE IS PRINTED FROM PROC1....!!');
+END PROC1;
+
+-- CALLING A PROCEDURE
+EXECUTE PROC1;
+EXEC PROC1;
+
+-- CREATING PROCEDURE WITH PARAMETER
+CREATE OR REPLACE PROCEDURE  GET_EMP_INFO(P_EMPNO IN NUMBER) AS
+    V_EMPNO NUMBER:=P_EMPNO;
+    V_ENAME VARCHAR2(20);
+ 	V_SALARY NUMBER;
+BEGIN
+    SELECT ENAME, SAL INTO V_ENAME, V_SALARY FROM SCOTT.EMP WHERE EMPNO=V_EMPNO;
+	DBMS_OUTPUT.PUT_LINE(' NAME OF THE PERSON IS:' || V_ENAME);
+	DBMS_OUTPUT.PUT_LINE(' SALARY OF THE PERSON IS:' || V_SALARY);
+END;
+
+EXEC GET_EMP_INFO(7839);
+
+CREATE PROCEDURE INOUT_DEMO2(TEXT IN OUT VARCHAR2) AS
+BEGIN
+    TEXT := CONCAT('I LOVE', TEXT);
+END;
+
+DECLARE
+    RESULT VARCHAR2(20):= 'PYTHON';
+BEGIN
+    INOUT_DEMO2(RESULT);
+    DBMS_OUTPUT.PUT_LINE(RESULT);
+END;
+
+DESC INOUT_DEMO2;
+
+DROP PROCEDURE INOUT_DEMO;
+
+CREATE TABLE EMP (EMPNO NUMBER, ENAME VARCHAR2(20),CITY VARCHAR2(20));
+
+INSERT INTO EMP VALUES(1001,'ABHI','HYD');
+INSERT INTO EMP VALUES(1002,'LATA','BLR');
+INSERT INTO EMP VALUES(1003,'RAM','DELHI');
+
+SELECT * FROM EMP;
+
+CREATE OR REPLACE TRIGGER emp_trig BEFORE INSERT OR UPDATE OR DELETE ON EMP
+DECLARE 
+V_DAY CHAR(3):=UPPER(TO_CHAR(SYSDATE,'DY'));
+BEGIN 
+   IF V_DAY='FRI' THEN
+       	RAISE_APPLICATION_ERROR(-20008,'MANIPULATION ON EMP TABLE IS NOT ALLOWED ON FRIDAY...!!');
+   END IF;
+END;
+
+-- TRIGGER
+	--EVENT --> CONDITION --> ACTION
+	--EVENT -->  IT CAN BE ANY DDL/DML COMMENT
+
+
+==========================================================
+
+CASE STUDY
+
+-- Creating Customer table
+CREATE TABLE Customer (
+    Cust_id INT PRIMARY KEY,
+    Customer_name VARCHAR(50) NOT NULL,
+    City VARCHAR(50),
+    Category VARCHAR(20) CHECK (Category IN ('Retail', 'Wholesale')),
+    Email VARCHAR(100) UNIQUE
+);
+
+-- Inserting records into Customer table
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(101, 'John', 'Bengaluru', 'Retail', 'john@xyz.com');
+
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(102, 'Smith', 'Hyderabad', 'Retail', 'smith@xyz.com');
+
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(103, 'Bob', 'Bengaluru', 'Retail', NULL);
+
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(104, 'Aliva', 'Hyderabad', 'Wholesale', 'aliva@abc.com');
+
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(105, 'Lakshya', 'Hyderabad', 'Wholesale', NULL);
+
+INSERT INTO Customer (Cust_id, Customer_name, City, Category, Email) VALUES
+(106, 'Akhil', 'Bengaluru', 'Wholesale', NULL);
+
+-- Creating Product table
+CREATE TABLE Product (
+    Product_id INT PRIMARY KEY,
+    Product_name VARCHAR(50) NOT NULL,
+    Product_category VARCHAR(50) NOT NULL,
+    Price DECIMAL(10,2) CHECK (Price > 0)
+);
+
+-- Inserting records into Product table
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1001, 'Shirt', 'Clothing', 1000.00);
+
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1002, 'Trouser', 'Clothing', 1500.00);
+
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1003, 'Shoes', 'Accessories', 2000.00);
+
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1004, 'Belt', 'Accessories', 700.00);
+
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1005, 'Hat', 'Fashion', 300.00);
+
+INSERT INTO Product (Product_id, Product_name, Product_category, Price) VALUES
+(1006, 'Goggle', 'Fashion', 500.00);
+
+-- Creating Orders table
+CREATE TABLE Orders (
+    Ord_id INT PRIMARY KEY,
+    Cust_id INT,
+    Product_id INT,
+    Ord_date DATE,
+    Quantity INT CHECK (Quantity > 0),
+    FOREIGN KEY (Cust_id) REFERENCES Customer(Cust_id),
+    FOREIGN KEY (Product_id) REFERENCES Product(Product_id)
+);
+
+-- Inserting records into Orders table
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(10, 101, 1001, DATE '2023-01-01', 2);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(20, 105, 1002, DATE '2023-12-01', 3);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(30, 103, 1003, DATE '2023-12-23', 1);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(40, 104, 1006, DATE '2023-02-15', 4);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(50, 103, 1002, DATE '2023-05-10', 3);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(60, 101, 1005, DATE '2023-02-07', 2);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(70, 102, 1001, DATE '2023-08-04', 6);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(80, 106, 1004, DATE '2023-03-30', 8);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(90, 104, 1003, DATE '2023-02-09', 10);
+
+INSERT INTO Orders (Ord_id, Cust_id, Product_id, Ord_date, Quantity) VALUES
+(100, 105, 1004, DATE '2023-10-02', 5);
+
+SELECT * FROM CUSTOMER;
+SELECT * FROM PRODUCT;
+UPDATE Product SET Product_category = NULL WHERE Product_id IN (1002, 1004);
+SELECT * FROM ORDERS;
+
+
+
+=======================================================
+-------------Questions----------------    
+-- Retrieve the names of every customers who placed the orders before 2023-07-25  
+SELECT DISTINCT Customer_name FROM Customer
+JOIN Orders ON Customer.Cust_id = Orders.Cust_id
+WHERE Orders.Ord_date < DATE '2023-07-25';
+
+-- List out every order made by John
+SELECT * FROM Orders
+JOIN Customer ON Orders.Cust_id = Customer.Cust_id
+WHERE Customer.Customer_name = 'John';
+
+-- Get the citywise count of customers
+SELECT City, COUNT(*) AS Customer_Count FROM Customer
+GROUP BY City;
+
+-- Add a new column 'Bill_amount'
+ALTER TABLE Orders ADD Bill_amount NUMBER(10,2);
+
+-- Populate 'Bill_amount' using a simple update with a join
+UPDATE Orders o
+JOIN Product p ON o.Product_id = p.Product_id
+SET o.Bill_amount = p.Price * o.Quantity;
+
+
+-- Calculate the number of unique products in the Product table
+SELECT COUNT(DISTINCT Product_id) AS Unique_Products FROM Product;
+
+-- List every product with a unit price between 500 and 1500
+SELECT * FROM Product WHERE Price BETWEEN 500 AND 1500;
+
+-- Find out how many orders were booked
+SELECT COUNT(*) AS Total_Orders FROM Orders;
+
+-- Average order amount for customers who ordered before 2023-03-25
+SELECT AVG(Bill_amount) AS Avg_Order_Amount FROM Orders WHERE Ord_date < DATE '2023-03-25';
+
+-- Customer who made the maximum bill amount  
+SELECT Customer_name  
+FROM Customer c  
+JOIN Orders o ON c.Cust_id = o.Cust_id  
+WHERE o.Bill_amount = (SELECT MAX(Bill_amount) FROM Orders);  
+
+
+-- Most popular product among customers who ordered in February 2023
+SELECT Product_name FROM Product
+JOIN Orders ON Product.Product_id = Orders.Product_id
+WHERE EXTRACT(MONTH FROM Ord_date) = 2 AND EXTRACT(YEAR FROM Ord_date) = 2023
+GROUP BY Product_name ORDER BY COUNT(*) DESC LIMIT 1;
+
+-- Total revenue from orders placed in February 2023
+SELECT SUM(Bill_amount) AS Total_Revenue FROM Orders
+WHERE EXTRACT(MONTH FROM Ord_date) = 2 AND EXTRACT(YEAR FROM Ord_date) = 2023;
+
+-- Number of orders placed by customers who spent more than 3000 in a single order
+SELECT COUNT(*) FROM Orders WHERE Bill_amount > 3000;
+
+-- Customers who booked more than two orders
+SELECT Cust_id, COUNT(*) FROM Orders GROUP BY Cust_id HAVING COUNT(*) > 2;
+
+--Total amount spent by each customer in December 2023
+SELECT Cust_id, SUM(Bill_amount) FROM Orders
+WHERE EXTRACT(MONTH FROM Ord_date) = 12 AND EXTRACT(YEAR FROM Ord_date) = 2023
+GROUP BY Cust_id;
+
+-- Customer who placed orders in both May and December 2023
+SELECT Cust_id FROM Orders
+WHERE EXTRACT(MONTH FROM Ord_date) = 5 AND EXTRACT(YEAR FROM Ord_date) = 2023
+INTERSECT
+SELECT Cust_id FROM Orders
+WHERE EXTRACT(MONTH FROM Ord_date) = 12 AND EXTRACT(YEAR FROM Ord_date) = 2023;
+
+-- Top 3 customers who spent the most  
+SELECT Cust_id, SUM(Bill_amount) AS Total_Spent  
+FROM Orders  
+GROUP BY Cust_id  
+ORDER BY Total_Spent DESC  
+FETCH FIRST 3 ROWS ONLY;  
+
+-- Average order amount for customers who purchased a 'Shirt'
+SELECT AVG(Bill_amount) FROM Orders
+JOIN Product ON Orders.Product_id = Product.Product_id
+WHERE Product_name = 'Shirt';
+
+-- Percentage of customers who have placed more than one order
+SELECT (COUNT(DISTINCT Cust_id) * 100.0 / (SELECT COUNT(*) FROM Customer)) AS Percentage FROM Orders
+GROUP BY Cust_id HAVING COUNT(*) > 1;
+
+-- Customer who spent the most on a single order  
+SELECT Customer_name  
+FROM Customer c  
+JOIN Orders o ON c.Cust_id = o.Cust_id  
+WHERE o.Bill_amount = (SELECT MAX(Bill_amount) FROM Orders);  
+
+
+-- Products that were not ordered by any customer
+SELECT * FROM Product WHERE Product_id NOT IN (SELECT DISTINCT Product_id FROM Orders);
+
+-- Average total amount spent by customers in February 2023  
+SELECT AVG(Total_Spent)  
+FROM (  
+  SELECT Cust_id, SUM(Bill_amount) AS Total_Spent  
+  FROM Orders  
+  WHERE Ord_date BETWEEN DATE '2023-02-01' AND DATE '2023-02-28'  
+  GROUP BY Cust_id  
+);  
+
+
+-- Customers who have not placed any orders from May till August 2023
+SELECT * FROM Customer WHERE Cust_id NOT IN (
+  SELECT DISTINCT Cust_id FROM Orders
+  WHERE EXTRACT(MONTH FROM Ord_date) BETWEEN 5 AND 8 AND EXTRACT(YEAR FROM Ord_date) = 2023
+);
+
+-- -- Names of all customers along with the total amount they have spent, ordered by the highest spender
+SELECT Customer_name, SUM(Bill_amount) AS Total_Spent FROM Customer
+JOIN Orders ON Customer.Cust_id = Orders.Cust_id
+GROUP BY Customer_name ORDER BY Total_Spent DESC;
+
+-- Find the product with the highest number of orders
+SELECT Product_name FROM Product
+JOIN Orders ON Product.Product_id = Orders.Product_id
+GROUP BY Product_name ORDER BY COUNT(*) DESC LIMIT 1;
+
+-- Total revenue for each product
+SELECT Product_name, SUM(Bill_amount) AS Total_Revenue FROM Product
+JOIN Orders ON Product.Product_id = Orders.Product_id
+GROUP BY Product_name;
+
+-- Product with the highest revenue
+SELECT Product_name FROM Product
+JOIN Orders ON Product.Product_id = Orders.Product_id
+GROUP BY Product_name ORDER BY SUM(Bill_amount) DESC LIMIT 1;
+
+-- Categorize customers based on total spending
+SELECT Customer_name, 
+  CASE 
+    WHEN SUM(Bill_amount) > 7000 THEN 'Premium'
+    WHEN SUM(Bill_amount) BETWEEN 5000 AND 7000 THEN 'Classic'
+    ELSE 'Regular'
+  END AS Customer_Category
+FROM Customer
+JOIN Orders ON Customer.Cust_id = Orders.Cust_id
+GROUP BY Customer_name;
+
+-- Add column for email status
+SELECT Customer_name, 
+  CASE 
+    WHEN Email IS NOT NULL AND Email <> '' THEN 'Email Available'
+    ELSE 'Email Required'
+  END AS Email_Status
+FROM Customer;
+
+-- Display 'No Product' if no entry in product category
+SELECT Product_name, 
+  COALESCE(Product_category, 'No Product') AS Product_Category
+FROM Product;
+
+-- List out the product names ordered by 'John'
+SELECT Product_name FROM Product
+JOIN Orders ON Product.Product_id = Orders.Product_id
+JOIN Customer ON Orders.Cust_id = Customer.Cust_id
+WHERE Customer.Customer_name = 'John';

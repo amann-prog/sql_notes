@@ -1,0 +1,152 @@
+Day 1 Revisited:
+
+Database fundamentals
+
+	-- What is data, database, DBMS
+	-- Advantages of Database System
+	-- Schemas and Instances 
+		-- physical schema
+		-- logical schema
+		-- view schema
+
+Data models:
+	-- Hierarchical model
+	-- Network model
+	-- ER model : entity, attribute, relationships
+	-- Relational model : tables, rows --> records/tuples, columns --> attributes/fields
+	
+Mapping of ER to relational model
+	-- how to map entities, relationships, simple and composite attrubutes, multivalued attributes, etc.
+
+Types of Keys:
+	-- Super key
+	-- Candidate key  : minimul subset for unique identification of the tuples, table can have multiple candidate keys
+	-- Primary key : unique and not null, table can have only one primary key
+	-- foreign key : 
+		-- should refer to the primary key
+		-- can have duplicate values
+		-- can have nulls 
+		-- but should br a subset of primary key of another table
+		-- maintens referential integrity	
+	-- alternate key: all other candidate keys apart from primary keys
+	-- composite key : key is composed of multiple columns 
+	
+
+Normalization: 
+	-- process of breking down the complex relations into simple one
+	-- purpose: remove redundency of the data
+	-- step wise process: 1NF, 2NF, 3NF and BCNF
+
+Statements in SQL
+	-- DDL : Create, Alter, Drop and Truncate
+ 	-- DML : Insert, Update, Delete
+	-- DCL : Grant and Revoke
+	-- TCL : Commit, Rollback, Savepoint
+	-- DQL : Select
+
+Constraints:
+	-- unique
+	-- not null
+	-- primary key
+	-- foreign key : on delete set null, on delete cascade
+	-- check
+	-- default
+	
+----------------------------------------------------------------------------
+Day 2: Revisited
+
+Synonym: Alternate name to be given to table
+
+Index: 
+	-- useful for efficient retrieval of the data
+	-- ways of creating index: manual and automatic
+			-- when we create unique constraint or primary key constraint then idex gets created automatically
+			-- manual: create index command/statement
+	-- types of Index: unique index, non-unique index and composite index
+	-- dropping an index
+
+Select Statements:
+	-- filtering the rows
+	-- filtering the columns
+	-- order by
+
+Operators and functions : 
+	-- useful filtering the records
+	-- relational operators
+	-- logical operators --> and, or, not
+	-- additional operators : any, all, in, between, is null, is not null, like
+	
+Functions:
+	-- concept functions
+	-- types of functions
+		-- user defined functions and built-in functions
+		-- single row functions and multi-row/aggregate functions
+	
+
+String functions
+	-- operate on strings or text data
+	-- upper, lower, initcap, ltrim, rtrim, trim, lpad, rpad, replace, concat, substr, instr, length
+
+General functions
+	-- used for general purpose
+	-- useful for handling null values
+	-- nvl, nvl2, nullif, coalesce, decode, case, regexp_like, regexp_replace
+
+Number functions:
+	-- to operate on numeric values
+	-- mod, abs, power, trunc, round, floor, ceil
+	
+	
+================================================================================================
+
+Day 3 Rivision:
+
+Types conversion
+	-- implicit type conversion
+	-- explicit type conversion
+		-- to_number()  --> string to number conversion, it should be a vaild number in string format
+		-- to_char() --> number or date to string conversion, in case of date to string specify date format
+		-- to_date() --> char to date conversion, specify date format follwed in the string for parsing it correctly
+		
+Date functions:
+	-- add_months  --> add number of mionths duration in the given date
+	-- months_between --> how mnay months between two given dates	
+	-- last_day --> last of the month of given date
+	-- next_day --> date on next specified weekday fro the mentioned date
+	-- trunc  --> takes to the beginnig of the the month, quearter, or year 
+	-- extract  --> get the specific component from date or timestamp value
+	
+Joins: 
+	-- cross join --> cartesian product, joins every row of one table with all rows of another table
+	-- inner join --> join sthe common data points/records only from both the tables (old style join, natural join, on clause and using clause)
+	-- outer join	
+		-- left join   --> everything from left table, and mathing data from right table
+		-- right join  --> everything from right table, and mathing data from left table
+		-- full join   --> all the data points from both the tables will be includded, matched records will be joined and for unmatched records we put null
+	-- equi-join and non-equi-join   --> whether the join condition is on equality of some other relational operator 
+	-- self join  --> joining the data from any table with itself
+	
+Analytical functions:
+	-- row_number() --> gives numbers to the rows on specific criteria (in over function we write partition by and order by)
+	-- rank() -->  gives rank to the rows on specific criteria, if values are same the rank will also be same, and next ranks will be skipped
+	-- dense_rank() -> gives rank to the rows on specific criteria, if values are same the dense_rank will also be same, and next ranks will not be skipped
+	-- listagg() --> aggregates/collects the values together from the mentioned column
+	-- first_value() --> gives first value for the specified column as per criteria specified in the over() function
+	-- last_value --> gives last value for the specified column as per criteria specified in the over() function
+	-- lead() --> shifts the values upward fro mentioned column with mentioned displacement
+	-- lag() --> shifts the values downward fro mentioned column with mentioned displacement
+	
+Groups and Aggregation 
+	-- group functions --> sum, min, max, count, avg, stddev, variance
+	-- group by clause -->  group the data as per mentioned column/s values
+	-- having --> executes after group by, and before select, filters the groups prepared in group by clause
+	
+Select statement summary
+	-- while writing : select --> from --> where --> group by --> having --> order by
+	-- while executing : from --> where --> group by --> having --> select --> order by
+	
+	
+	
+		
+
+

@@ -1,0 +1,240 @@
+-- display the name of the person who is getting least salary
+
+select ename, sal from scott.emp 
+order by sal 
+fetch first 1 row only
+
+select ename from scott.emp where sal = min(sal);   -- not possible
+
+select ename, sal from scott.emp where sal = (select min(sal) from scott.emp); 
+
+select ename, sal from scott.emp where sal = 800;
+
+-- display the name of the person who is getting sal greater than the overall average salary
+select ename, sal from scott.emp where sal > (select avg(sal) from scott.emp);
+
+-- get the details of the people who are getting salary higher than Allen and Jones
+SELECT * FROM SCOTT.EMP WHERE SAL > ALL (SELECT SAL FROM SCOTT.EMP WHERE ENAME='ALLEN' OR ENAME='JONES')
+
+-- DISPLAY THE LIST OF PEOPLE WHO ARE WORKING IN KING'S DEPT OR SCOTT'S DEPT
+SELECT * FROM SCOTT.EMP WHERE DEPTNO = ANY(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME='KING' OR ENAME='SCOTT')
+SELECT * FROM SCOTT.EMP WHERE DEPTNO IN(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME='KING' OR ENAME='SCOTT')
+SELECT * FROM SCOTT.EMP WHERE DEPTNO IN(SELECT DEPTNO FROM SCOTT.EMP WHERE ENAME IN('KING', 'SCOTT'))
+
+SELECT SCOTT.EMP.*, 
+    (SELECT MIN(SAL) FROM SCOTT.EMP) AS MIN_SAL 
+    FROM SCOTT.EMP;
+
+SELECT SCOTT.EMP.*,
+    (SELECT MIN(SAL) FROM SCOTT.EMP) AS MIN_SAL,
+    (SELECT MAX(SAL) FROM SCOTT.EMP) AS MAX_SAL
+    FROM SCOTT.EMP;
+
+SELECT * 
+    FROM (SELECT DEPTNO, 
+    			MIN(SAL) AS MIN_SAL, 
+    			MAX(SAL) AS MAX_SAL, 
+    			ROUND(AVG(SAL), 2) AS AVG_SAL, 
+    			SUM(SAL) AS TOTAL_SAL
+    		FROM SCOTT.EMP
+    		GROUP BY DEPTNO) 
+
+
+WITH EMP_SUMMARY AS (SELECT DEPTNO, 
+    			MIN(SAL) AS MIN_SAL, 
+    			MAX(SAL) AS MAX_SAL, 
+    			ROUND(AVG(SAL), 2) AS AVG_SAL, 
+    			SUM(SAL) AS TOTAL_SAL
+    		FROM SCOTT.EMP
+    		GROUP BY DEPTNO)
+SELECT * FROM SCOTT.EMP JOIN EMP_SUMMARY USING(DEPTNO) ORDER BY DEPTNO;
+
+SELECT * FROM EMP_SUMMARY;
+
+SELECT * FROM SCOTT.DEPT;
+
+-- GET THE DETAILS OF DEPARTMENTS WHERE WE HAVE ANY EMPLOYEE WORKING
+SELECT * FROM SCOTT.DEPT WHERE EXISTS (SELECT * FROM SCOTT.EMP WHERE SCOTT.EMP.DEPTNO = SCOTT.DEPT.DEPTNO)
+
+-- GET THE DETAILS OF DEPARTMENTS WHERE WE DO NOT HAVE ANY EMPLOYEE WORKING
+SELECT * FROM SCOTT.DEPT WHERE NOT EXISTS (SELECT * FROM SCOTT.EMP WHERE SCOTT.EMP.DEPTNO = SCOTT.DEPT.DEPTNO)
+
+-- GET THE DETAILS OF EMPLOYEES WHO ARE GETTING SALARY HIGHER THAN THE AVERAGE OF THEIR RESPECTIVE DEPARTMENT
+
+select * from scott.emp where sal> any (select avg(sal) from scott.emp group by deptno)  -- not 100% correct solution
+
+-- correlated subquery
+    -- it's using the same table which is used in the outer query
+	-- for evry record being processed with outer query, complete inner query will run iterativly
+select * from scott.emp e1 where e1.sal > (select avg(e2.sal) from scott.emp e2 where e1.deptno = e2.deptno)
+
+select deptno, avg(sal) from scott.emp group by deptno  -- for verification of the above output
+
+-- get the details of the person who is getting highest salary in his dept
+SELECT * FROM SCOTT.EMP E1 WHERE E1.SAL=(SELECT MAX(E2.SAL) FROM SCOTT.EMP E2 WHERE E1.DEPTNO=E2.DEPTNO );
+
+select deptno, max(sal) from scott.emp group by deptno;
+
+
+-- set operations
+create table emp1 (empno number, ename varchar2(20), deptno number);
+
+insert into emp1 values(1001, 'Ajit', 10);
+insert into emp1 values(1002, 'Bob', 10);
+insert into emp1 values(1003, 'John', 20);
+insert into emp1 values(1004, 'Elsa', 20);
+
+create table emp2 (empno number, ename varchar2(20), deptno number);
+
+insert into emp2 values(1003, 'John', 20);
+insert into emp2 values(1004, 'Elsa', 20);
+insert into emp2 values(1005, 'Raju', 30);
+insert into emp2 values(1006, 'Sunny', 30);
+
+select * from emp1;
+select * from emp2;
+
+select * from emp1
+union 
+select * from emp2
+
+select * from emp1
+union all
+select * from emp2
+
+select * from emp1
+intersect
+select * from emp2
+
+select * from emp1
+minus 
+select * from emp2
+
+select * from emp2
+minus
+select * from emp1
+
+-------------------------------------------------
+-- hierarchical retrieval
+SELECT EMPNO, ENAME, MGR FROM SCOTT.EMP CONNECT BY PRIOR  EMPNO=MGR START WITH ENAME='KING'
+
+SELECT EMPNO, ENAME, MGR, LEVEL FROM SCOTT.EMP CONNECT BY PRIOR  EMPNO=MGR START WITH ENAME='KING' ORDER BY LEVEL
+
+SELECT EMPNO, ENAME, MGR, LEVEL 
+    FROM SCOTT.EMP 
+    CONNECT BY PRIOR  EMPNO=MGR START WITH ENAME='KING' ORDER SIBLINGS BY ENAME DESC
+
+
+SELECT SYS_CONNECT_BY_PATH(ENAME, '/') FROM SCOTT.EMP 
+    CONNECT BY PRIOR  EMPNO=MGR START WITH ENAME='KING'
+
+
+SELECT ENAME, CONNECT_BY_ISLEAF FROM SCOTT.EMP 
+    CONNECT BY PRIOR  EMPNO=MGR START WITH ENAME='KING'
+	
+	
+------------------------------------------------------------
+select * from emp;
+
+-- What is view?
+	-- virtual table
+	-- is useful for fine grained access control
+	-- types of view
+		-- simple view  --> built on a single table --> no any aggregation, join, any function is applied on the data from base table
+		-- complex view --> result of aggregation, join or some functions on the base table/s
+
+CREATE VIEW DEPT_10_VIEW AS SELECT * FROM EMP WHERE DEPTNO = 10;
+
+DROP VIEW DEPT_10_VIEW;
+
+CREATE OR REPLACE VIEW DEPT_10_VIEW AS SELECT * FROM EMP WHERE DEPTNO = 10;
+
+ALTER VIEW DEPT_10_VIEW ADD TEST_COL NUMBER;  --- ALTER OPERATION IS NOT APPLICABLE FOR VIEWS
+
+SELECT * FROM DEPT_10_VIEW;
+
+INSERT INTO DEPT_10_VIEW VALUES(9999, 'DNYANESH', 'ANALYST', 7839, '04-JUL-22', 1000, NULL, 10);
+SELECT * FROM EMP;
+
+INSERT INTO DEPT_10_VIEW VALUES(8888, 'RAHUL', 'ANALYST', 7839, '04-JUL-22', 1000, NULL, 20);
+
+DELETE FROM DEPT_10_VIEW WHERE EMPNO=8888;
+DELETE FROM DEPT_10_VIEW WHERE EMPNO=9999;
+
+CREATE OR REPLACE VIEW DEPT_10_VIEW AS SELECT * FROM EMP WHERE DEPTNO = 10 WITH READ ONLY;
+INSERT INTO DEPT_10_VIEW VALUES(9999, 'DNYANESH', 'ANALYST', 7839, '04-JUL-22', 1000, NULL, 10);
+
+CREATE OR REPLACE VIEW DEPT_10_VIEW AS SELECT * FROM EMP WHERE DEPTNO = 10 WITH CHECK OPTION;
+INSERT INTO DEPT_10_VIEW VALUES(9999, 'DNYANESH', 'ANALYST', 7839, '04-JUL-22', 1000, NULL, 10);
+
+SELECT * FROM DEPT_10_VIEW;
+INSERT INTO DEPT_10_VIEW VALUES(7777, 'RAHUL', 'ANALYST', 7839, '04-JUL-22', 1000, NULL, 20);
+
+-- INCREASE THE SAL OF KING BY 10% IN THE VIEW AND CHECK IT IN VIEW AS WELL AS TABLE
+-- CHANGE JOB OF FORD FROM 'ANALYST' TO 'SR. ANALYST' IN THE TABLE  AND CHECK IT IN VIEW AS WELL AS TABLE
+
+
+-- COMPLEX VIEW
+
+CREATE OR REPLACE VIEW EMP_SUMMARY AS 
+    SELECT DEPTNO, COUNT(*) AS TOTAL_EMPLOYEES, MIN(SAL) AS MIN_SAL, MAX(SAL) AS MAX_SAL, 
+    SUM(SAL) AS TOTAL_SAL, ROUND(AVG(SAL), 2) AS AVG_SAL
+    FROM EMP
+    GROUP BY DEPTNO;
+
+SELECT * FROM EMP_SUMMARY;
+
+UPDATE EMP_SUMMARY SET TOTAL_EMPLOYEES = 10 WHERE DEPTNO = 30;
+
+SELECT * FROM SCOTT.DEPT;
+
+CREATE VIEW EMP_DEPT_DATA AS 
+	SELECT * FROM SCOTT.EMP JOIN SCOTT.DEPT USING(DEPTNO);
+
+SELECT * FROM EMP_DEPT_DATA
+
+----------------------------------------------------------
+-- EXPLAIN STATEMENT
+-- OPTIMIZATION WITH INDEX
+
+SELECT * FROM EMP;
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE DEPTNO=10;
+SELECT * FROM DBMS_XPLAN.DISPLAY();
+
+CREATE INDEX DEPT_IDX ON EMP(DEPTNO);
+DROP INDEX DEPT_IDX;
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE DEPTNO=10;
+SELECT * FROM DBMS_XPLAN.DISPLAY();
+
+EXPLAIN PLAN FOR SELECT * FROM EMP WHERE JOB = 'MANAGER';
+SELECT * FROM DBMS_XPLAN.DISPLAY();
+
+
+
+EXPLAIN PLAN FOR SELECT * FROM SCOTT.EMP CROSS JOIN SCOTT.DEPT;
+SELECT * FROM DBMS_XPLAN.DISPLAY();
+
+EXPLAIN PLAN FOR SELECT DEPTNO, COUNT(*) AS TOTAL_EMPLOYEES, MIN(SAL) AS MIN_SAL, MAX(SAL) AS MAX_SAL, 
+    SUM(SAL) AS TOTAL_SAL, ROUND(AVG(SAL), 2) AS AVG_SAL
+    FROM EMP
+    GROUP BY DEPTNO;
+SELECT * FROM DBMS_XPLAN.DISPLAY();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
